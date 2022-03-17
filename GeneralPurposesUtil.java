@@ -11,6 +11,10 @@ public class GeneralPurposesUtil {
 
 	static final PrintStream printStreamOriginal = System.out;
 
+	private ObjectMapper mapper = new ObjectMapper();
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	/**
 	 * 
 	 * @param clazz      = class where the method is present
@@ -104,5 +108,39 @@ public class GeneralPurposesUtil {
 	private static void EnablePrint() {
 		// re-enable print
 		System.setOut(printStreamOriginal);
+	}
+
+	/**
+	 * @param <T>
+	 * @param json
+	 * @return Clazz instance
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T deserialize(String json, Class<?> clazz) {
+		try {
+			Object o = mapper.readValue(json, clazz);
+			return (T) o;
+		} catch (IOException e) {
+			logger.warn(
+					"Cannot deserialize JSON: {} \nto {} instance. \nException catch at {} deserialize(String json, Class<?> clazz) method \nreason: {}: ",
+					json, clazz, this.getClass(), e.getMessage());
+
+		}
+		return null;
+	}
+
+	public String serialize(Object obj) {
+
+		try {
+			return mapper.writeValueAsString(obj);
+		} catch (JsonProcessingException e) {
+			logger.warn(
+					"Cannot serialize Object: {}.\nException catch at {} serialize(String json, Class<?> clazz) method \nreason: {}: ",
+					obj, this.getClass(), e.getMessage());
+
+		}
+		return null;
+
 	}
 }
